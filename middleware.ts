@@ -58,28 +58,6 @@ export async function middleware(req: NextRequest) {
         return moviePathRegex.test(path);
     }
 
-    // Enhanced debugging for production
-    const debugInfo = {
-        pathname,
-        hasToken: !!token,
-        tokenContent: token ? { sub: token.sub, email: token?.email } : null,
-        isAuthPage,
-        isProtectedRoute,
-        environment: process.env.NODE_ENV,
-        cookies: req.cookies.getAll().map(c => ({ 
-            name: c.name, 
-            hasValue: !!c.value,
-            isSecure: c.name.startsWith('__Secure-'),
-            isAuthRelated: c.name.includes('auth')
-        })),
-        userAgent: req.headers.get('user-agent')?.substring(0, 50)
-    };
-
-    // Always log in production to help debug
-    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
-        console.log('Middleware Debug:', JSON.stringify(debugInfo, null, 2));
-    }
-
     // Redirect unauthenticated users trying to access protected routes
     if (!token && isProtectedRoute) {
         console.log('Redirecting to /redirect - no valid token');
@@ -94,6 +72,5 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    console.log('Request proceeding normally');
     return NextResponse.next();
 }

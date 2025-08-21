@@ -2,7 +2,7 @@ import { Film } from "lucide-react";
 
 export default function Footer(){
     return (
-        <footer className="py-16 border-t border-zinc-800/50 bg-gradient-to-b from-zinc-950/50 to-zinc-950">
+        <footer className="py-8 border-t border-zinc-800/50 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-8">

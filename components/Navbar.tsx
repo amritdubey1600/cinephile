@@ -25,6 +25,7 @@ export default function Navbar() {
     const {data, status} = useSession();
 
     const userDropdownRef = useRef<HTMLDivElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (status === "authenticated" && data?.user) {
@@ -159,7 +160,7 @@ export default function Navbar() {
 
                                 {/* User Dropdown */}
                                 {isUserDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-64 bg-zinc-900/95 backdrop-blur-sm border border-zinc-800/50 rounded-xl shadow-2xl py-2">
+                                    <div className="absolute right-0 mt-2 w-64 bg-zinc-900/95 backdrop-blur-sm border border-zinc-800/50 rounded-xl shadow-2xl py-2 animate-in fade-in-0 zoom-in-95 duration-200">
                                         {/* User Info */}
                                         <div className="px-4 py-3 border-b border-zinc-800/50">
                                             <div className="flex items-center space-x-3">
@@ -227,100 +228,151 @@ export default function Navbar() {
                     <button 
                         onClick={handleMobileMenuToggle}
                         className="md:hidden p-2 rounded-lg hover:bg-zinc-800/50 transition-colors"
+                        aria-expanded={isMobileMenuOpen}
+                        aria-label="Toggle mobile menu"
                     >
-                        <svg 
-                            className={`w-5 h-5 text-zinc-300 transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-90' : ''}`} 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                        >
-                            {isMobileMenuOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
+                        <div className="relative w-5 h-5 flex items-center justify-center">
+                            {/* Hamburger/Close Icon with smooth transition */}
+                            <div className="absolute inset-0 flex flex-col justify-center space-y-1">
+                                <span 
+                                    className={`block h-0.5 w-5 bg-zinc-300 transition-all duration-300 ease-in-out transform ${
+                                        isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : 'rotate-0 translate-y-0'
+                                    }`}
+                                />
+                                <span 
+                                    className={`block h-0.5 w-5 bg-zinc-300 transition-all duration-300 ease-in-out ${
+                                        isMobileMenuOpen ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
+                                    }`}
+                                />
+                                <span 
+                                    className={`block h-0.5 w-5 bg-zinc-300 transition-all duration-300 ease-in-out transform ${
+                                        isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : 'rotate-0 translate-y-0'
+                                    }`}
+                                />
+                            </div>
+                        </div>
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Navigation - Now positioned absolutely to overlay content */}
-            {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 right-0 bg-zinc-900/95 backdrop-blur-sm shadow-2xl z-40">
-                    <div className="px-4 py-3 space-y-1">
-                        {navLinks.map((link) => (
+            {/* Mobile Navigation Overlay */}
+            <div 
+                className={`md:hidden fixed inset-0 top-16 bg-black/20 backdrop-blur-sm transition-all duration-300 ease-in-out z-30 ${
+                    isMobileMenuOpen 
+                        ? 'opacity-100 pointer-events-auto' 
+                        : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={closeMobileMenu}
+            />
+
+            {/* Mobile Navigation Menu */}
+            <div 
+                ref={mobileMenuRef}
+                className={`md:hidden absolute top-full left-0 right-0 bg-zinc-900/95 backdrop-blur-sm shadow-2xl z-40 transition-all duration-300 ease-in-out transform origin-top ${
+                    isMobileMenuOpen 
+                        ? 'opacity-100 scale-y-100 translate-y-0' 
+                        : 'opacity-0 scale-y-0 -translate-y-2'
+                }`}
+            >
+                <div className="px-4 py-3 space-y-1">
+                    {/* Navigation Links with staggered animation */}
+                    {navLinks.map((link, index) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            className={`block px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-all duration-300 transform ${
+                                isMobileMenuOpen 
+                                    ? 'translate-x-0 opacity-100' 
+                                    : 'translate-x-4 opacity-0'
+                            }`}
+                            style={{ 
+                                transitionDelay: isMobileMenuOpen ? `${(index + 1) * 50}ms` : '0ms' 
+                            }}
+                            onClick={closeMobileMenu}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                    
+                    {/* Mobile User Section */}
+                    {user ? (
+                        <div 
+                            className={`pt-3 transition-all duration-300 transform ${
+                                isMobileMenuOpen 
+                                    ? 'translate-x-0 opacity-100' 
+                                    : 'translate-x-4 opacity-0'
+                            }`}
+                            style={{ 
+                                transitionDelay: isMobileMenuOpen ? '150ms' : '0ms' 
+                            }}
+                        >
+                            {/* User Info in Mobile */}
+                            <div className="flex items-center px-3 py-2 mb-2">
+                                <div className="w-10 h-10 rounded-full overflow-hidden border border-zinc-600/50 mr-3 relative">
+                                    <Image
+                                        src={user.image}
+                                        alt={user.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <p className="text-white font-medium text-sm">{user.name}</p>
+                                    <p className="text-zinc-400 text-xs">{user.email}</p>
+                                </div>
+                            </div>
+                            
+                            {/* Mobile Menu Items */}
                             <Link
-                                key={link.name}
-                                href={link.href}
+                                href="/profile"
+                                className="flex items-center px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-200"
+                                onClick={closeMobileMenu}
+                            >
+                                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Profile
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center w-full text-left px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-200"
+                            >
+                                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    ) : (
+                        /* Mobile Not Logged In */
+                        <div 
+                            className={`pt-3 space-y-2 transition-all duration-300 transform ${
+                                isMobileMenuOpen 
+                                    ? 'translate-x-0 opacity-100' 
+                                    : 'translate-x-4 opacity-0'
+                            }`}
+                            style={{ 
+                                transitionDelay: isMobileMenuOpen ? '150ms' : '0ms' 
+                            }}
+                        >
+                            <Link
+                                href="/login"
                                 className="block px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors duration-200"
                                 onClick={closeMobileMenu}
                             >
-                                {link.name}
+                                Login
                             </Link>
-                        ))}
-                        
-                        {/* Mobile User Section */}
-                        {user ? (
-                            <div className="pt-3">
-                                {/* User Info in Mobile */}
-                                <div className="flex items-center px-3 py-2 mb-2">
-                                    <div className="w-10 h-10 rounded-full overflow-hidden border border-zinc-600/50 mr-3 relative">
-                                        <Image
-                                            src={user.image}
-                                            alt={user.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p className="text-white font-medium text-sm">{user.name}</p>
-                                        <p className="text-zinc-400 text-xs">{user.email}</p>
-                                    </div>
-                                </div>
-                                
-                                {/* Mobile Menu Items */}
-                                <Link
-                                    href="/profile"
-                                    className="flex items-center px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
-                                    onClick={closeMobileMenu}
-                                >
-                                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    Profile
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center w-full text-left px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
-                                >
-                                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    Sign Out
-                                </button>
-                            </div>
-                        ) : (
-                            /* Mobile Not Logged In */
-                            <div className="pt-3 space-y-2">
-                                <Link
-                                    href="/login"
-                                    className="block px-3 py-2 text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
-                                    onClick={closeMobileMenu}
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    href="/signup"
-                                    className="block px-3 py-2 bg-gradient-to-r from-zinc-700 to-zinc-600 hover:from-zinc-600 hover:to-zinc-500 text-white font-light rounded-lg transition-all duration-200 text-center"
-                                    onClick={closeMobileMenu}
-                                >
-                                    Sign Up
-                                </Link>
-                            </div>
-                        )}
-                    </div>
+                            <Link
+                                href="/signup"
+                                className="block px-3 py-2 bg-gradient-to-r from-zinc-700 to-zinc-600 hover:from-zinc-600 hover:to-zinc-500 text-white font-light rounded-lg transition-all duration-200 text-center"
+                                onClick={closeMobileMenu}
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </nav>
     );
 }

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
+import Footer from "@/sections/Footer";
 
 // Regex patterns to match dynamic routes
 const HIDE_NAVBAR_PATTERNS = [
@@ -10,6 +11,7 @@ const HIDE_NAVBAR_PATTERNS = [
   /^\/movies\/[^/]+\/book-tickets(\/.*)?$/,         // Matches /movies/:id/book-tickets and any subpaths
   /^\/login$/,                                     // Hides on /login
   /^\/signup$/,                                    // Hides on /signup
+  /^\/redirect$/,                                    // Hides on /redirect
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +23,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <>
       {!shouldHideNavbar && <Navbar />}
       {children}
+      {!shouldHideNavbar && <Footer />}
     </>
   );
 }

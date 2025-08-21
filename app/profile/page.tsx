@@ -163,6 +163,7 @@ export default function ProfilePage() {
                                 Your account information
                             </p>
                         </div>
+
                     </div>
                 </div>
             </div>

@@ -1,7 +1,6 @@
 import MovieCarousel from '@/components/MovieCarousel';
 import Hero from '@/sections/Hero';
 import Experiences from '@/sections/Experiences';
-import Footer from '@/sections/Footer';
 
 export default function CinephileHomepage() {
   return (
@@ -14,9 +13,6 @@ export default function CinephileHomepage() {
 
       {/* Experience Section */}
       <Experiences />
-      
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

@@ -93,14 +93,14 @@ export default function MovieDetails() {
                                 <h3 className="text-sm font-light text-zinc-400 uppercase tracking-wider">Synopsis</h3>
                                 <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-6 max-w-4xl mx-auto lg:mx-0">
                                     <div 
-                                        className="text-base leading-relaxed text-zinc-300 font-light"
+                                        className="text-base text-left leading-relaxed text-zinc-300 font-light"
                                         dangerouslySetInnerHTML={{ __html: movie.summary }}
                                     />
                                 </div>
                             </div>
 
                             {/* Action Button */}
-                            <div className="pt-6">
+                            <div className="pt-6 flex justify-center lg:justify-start">
                                 <button
                                     onClick={handleBookTickets}
                                     className="bg-gradient-to-r from-zinc-800 to-zinc-700 hover:from-zinc-700 hover:to-zinc-600 border border-zinc-600/50 hover:border-zinc-500/70 text-white font-light py-3 px-8 rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg w-full sm:w-auto flex items-center justify-center gap-3 group"
