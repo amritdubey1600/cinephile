@@ -3,6 +3,7 @@ import { cinemaHalls } from "@/lib/cinemainfo";
 import { useMovieStore } from "@/store/useMovieStore";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { removeSeatBookings } from "@/lib/firebase/controllers/seatControllers";
@@ -21,6 +22,7 @@ interface BookingType{
 export default function YourBookingsPage(){
     const [bookings, setBookings] = useState<BookingType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [sessionChecked, setSessionChecked] = useState<boolean>(false);
     const [confirmationModal, setConfirmationModal] = useState<{
         isOpen: boolean;
         booking: BookingType | null;
@@ -33,23 +35,61 @@ export default function YourBookingsPage(){
 
     const movies = useMovieStore((state) => state.movies);
     const { data, status } = useSession();
+    const router = useRouter();
+
+    // Enhanced session check with redirect handling
+    useEffect(() => {
+        // Wait a bit for session to fully initialize
+        const checkSession = async () => {
+            if (status === 'loading') {
+                return;
+            }
+
+            setSessionChecked(true);
+
+            // If definitely unauthenticated, redirect
+            if (status === 'unauthenticated') {
+                console.log('🔒 No session found, redirecting to /redirect');
+                router.push('/redirect');
+                return;
+            }
+
+            // If authenticated but no user data yet, wait a bit more
+            if (status === 'authenticated' && !data?.user?.email) {
+                console.log('⏳ Session authenticated but user data not ready, waiting...');
+                setTimeout(checkSession, 500); // Check again in 500ms
+                return;
+            }
+        };
+
+        checkSession();
+    }, [status, data?.user?.email, router]);
 
     useEffect(() => {
         const fetchBookings = async () => {
-            // Wait for session to load
-            if (status === 'loading' || !data?.user?.email) {
+            // Only fetch if session is confirmed and we have user email
+            if (!sessionChecked || status !== 'authenticated' || !data?.user?.email) {
                 return;
             }
 
             try {
+                console.log('📚 Fetching bookings for user:', data.user.email);
                 const res = await fetch(`/api/bookings?email=${encodeURIComponent(data.user.email)}`);
                 
                 if (res.ok) {
                     const responseData = await res.json();
                     setBookings(Array.isArray(responseData) ? responseData : []);
+                    console.log('✅ Bookings loaded:', responseData.length);
+                } else if (res.status === 401) {
+                    // Handle unauthorized - redirect to login
+                    console.log('🚫 Unauthorized API response, redirecting');
+                    router.push('/redirect');
+                } else {
+                    console.error('❌ Failed to fetch bookings:', res.status);
+                    setBookings([]);
                 }
             } catch (error) {
-                console.error('Fetch error:', error);
+                console.error('❌ Fetch error:', error);
                 setBookings([]);
             } finally {
                 setLoading(false);
@@ -57,7 +97,7 @@ export default function YourBookingsPage(){
         };
 
         fetchBookings();
-    }, [data?.user?.email, status]);
+    }, [sessionChecked, status, data?.user?.email, router]);
 
     const findMovieInfo = (movieId: string) => {
         const movieInfo = movies.find((movie) => String(movie.id) === movieId);
@@ -125,8 +165,14 @@ export default function YourBookingsPage(){
         setConfirmationModal({ isOpen: false, booking: null });
     };
 
-    if (loading || status === 'loading') {
+    // Show loading while checking session or fetching data
+    if (loading) {
         return <LoadingPage />;
+    }
+
+    // If unauthenticated, show nothing (redirect will happen)
+    if (status === 'unauthenticated') {
+        return null;
     }
 
     return (

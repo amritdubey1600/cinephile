@@ -4,7 +4,6 @@ import { getToken } from 'next-auth/jwt';
 export const config = {
     matcher: [
         '/profile',
-        '/bookings',
         '/movies/:id/:path+',
         '/',
         '/login',
