@@ -1,6 +1,6 @@
-import MovieCarousel from '@/components/MovieCarousel';
 import Hero from '@/sections/Hero';
 import Experiences from '@/sections/Experiences';
+import MovieCarouselHome from '@/components/MovieCarouselHome';
 
 export default function CinephileHomepage() {
   return (
@@ -9,7 +9,7 @@ export default function CinephileHomepage() {
       <Hero />
 
       {/* Movie Carousel Sections */}
-      <MovieCarousel />
+      <MovieCarouselHome />
 
       {/* Experience Section */}
       <Experiences />

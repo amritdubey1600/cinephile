@@ -1,5 +1,6 @@
 'use client';
 import CinemaReel from "@/components/CinemaReel";
+import Reveal from "@/components/Reveal";
 import { Play, Film, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +20,7 @@ export default function Hero(){
           ></div>
         </div>
 
+        <Reveal direction="down">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
 
@@ -85,6 +87,7 @@ export default function Hero(){
         <div className="absolute bottom-1/4 left-1/4 animate-pulse opacity-25" style={{ animationDuration: '5s', animationDelay: '1s' }}>
           <Star className="w-4 h-4 text-green-300" />
         </div>
+        </Reveal>    
       </section>
     );
 }
