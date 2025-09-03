@@ -23,7 +23,7 @@ export default function MovieDetails() {
         <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
             {/* Hero Section */}
             <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
+                <div className="absolute min-h-screen inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
                 <div className="relative max-w-6xl mx-auto px-6 py-16 lg:py-24">
                     <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
                         {/* Movie Poster */}
